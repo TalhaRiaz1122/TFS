@@ -1,4 +1,4 @@
-package com.tfs
+package com.tfsproject
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
