@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Linking,
 } from 'react-native';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -172,6 +173,32 @@ const LoginScreen = () => {
 
   // -------------------------
 
+  // -------------------------
+
+  const handleSlackLogin = async () => {
+    try {
+      const {data, error} = await supabase.auth.signInWithOAuth({
+        provider: 'slack_oidc',
+        options: {
+          redirectTo:
+            'https://zwpneqpmqrtaajfqrnuy.supabase.co/auth/v1/callback',
+        },
+      });
+
+      if (error) throw new Error(error.message);
+
+      if (data && data.url) {
+        Linking.openURL(data.url);
+      } else {
+        Alert.alert('Login Failed', 'Authentication URL is not available.');
+      }
+    } catch (error) {
+      Alert.alert('Login Failed', error.message);
+    }
+  };
+
+  // -------------------------
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -238,6 +265,9 @@ const LoginScreen = () => {
         <TouchableOpacity style={styles.googleButton} onPress={googleLogin}>
           <Text style={styles.buttonText}>Login with Google</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.SlackButton} onPress={handleSlackLogin}>
+          <Text style={styles.buttonText}>Login with slack</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -301,6 +331,13 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     backgroundColor: '#4285F4',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  SlackButton: {
+    backgroundColor: '#e01563',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
